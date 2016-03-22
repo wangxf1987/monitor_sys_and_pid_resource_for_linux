@@ -5,7 +5,7 @@ How to install it?
 ====
 not need install
 
-How to run?\<br>
+How to run?
 ====
 1. configure the main functional module
 -------
@@ -16,5 +16,6 @@ How to run?\<br>
 -------
    python <monitor_linux_for_influxd.py>
 
-About bug and want to improvment it. Please contact the author: xiaofeix.wang@gamil.com, I will reply to in not busy.
+About bug and want to improvment it. Please contact the author: xiaofeix.wang@gamil.com, 
+I will reply to in not busy.
  
