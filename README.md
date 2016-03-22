@@ -1,7 +1,7 @@
 # monitor_sys_and_pid_resource_for_linux
 # create by wangxf
 
-How to install it?
+How to install it?\n
 not need install
 
 How to run?
