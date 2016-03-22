@@ -14,7 +14,7 @@ How to run?
 
 2. excute the py file
 -------
-   python <monitor_linux_for_influxd.py>
+   [root@wangxf] python monitor_linux_for_influxd.py \<br>
 
 About bug and want to improvment it. Please contact the author: xiaofeix.wang@gamil.com, 
 I will reply to in not busy.
