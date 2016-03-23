@@ -12,9 +12,13 @@ class monitor_linux_for_influxd():
       2016-03-21
    """
    def __init__(self, pid, sleep_time=3):
-      csv_path = 'MonitorData_%s.csv' % \
-                 (str(datetime.datetime.now().\
-                  strftime('%Y%m%d%H%M%S')))
+      self.csv_name_sys = 'sys_data_%s.csv' % \
+                          (str(datetime.datetime.now().\
+                          strftime('%Y%m%d%H%M%S')))
+      self.csv_name_pid = 'pid_data_%s.csv' % \
+                          (str(datetime.datetime.now().\
+                          strftime('%Y%m%d%H%M%S')))
+
       self.pid = pid
       self.pid_name = psutil.Process(pid).name()
       self.sleep_time = sleep_time
@@ -119,56 +123,98 @@ class monitor_linux_for_influxd():
              iodata_pid_list
 
    def show_and_record_data(self):
-      cpu_percent_sys,\
-      phymem_list_sys = self.data_for_sys()
 
-      iops_read,\
-      iops_write,\
-      BW_read,\
-      BW_write = self.iodata_for_sys()
+      """Write data of system to csv file"""
+      csv_file_sys = file(self.csv_name_sys, 'wb')
+      sys_write_sys = csv.writer(csv_file_sys)
+      sys_write_sys.writerow(['Monitor Data for System'])
+      sys_write_sys.writerow(['CPU Percent',\
+                          'Used Memory Percent(total,%)',\
+                          'Used Memory Size(total,MB)',\
+                          'Total Memory Size(total,MB)',\
+                          'IOPS_read',\
+                          'IOPS_write',\
+                          'BW_read(Mbps)',\
+                          'BW_write(Mbps)'])
 
-      cpu_percent_pid,\
-      memory_used_pid,\
-      iodata_pid_list = self.data_for_influxd()
+      """Write pid of system to csv file"""
+      csv_file_pid = file(self.csv_name_pid, 'wb')
+      sys_write_pid = csv.writer(csv_file_pid)
+      sys_write_pid.writerow(['Monitor Data for PID'])
+      sys_write_pid.writerow(['PID: %s' % self.pid_name])
+      sys_write_pid.writerow(['PID CPU Percent(%)',\
+                          'PID MEM used(MB)',\
+                          'IOPS_read',\
+                          'IOPS_write',\
+                          'BW_read(Mbps)',\
+                          'BW_write(Mbps)'])
+      while True:
+         cpu_percent_sys,\
+         phymem_list_sys = self.data_for_sys()
+
+         iops_read,\
+         iops_write,\
+         BW_read,\
+         BW_write = self.iodata_for_sys()
+
+         cpu_percent_pid,\
+         memory_used_pid,\
+         iodata_pid_list = self.data_for_influxd()
       
-      """show data in """
-      print "*-"*32+"\n"+" "*23+"DATA INFO\n"
-      print "System monitoring data\n"+"-"*24
-      print "CPU percent(total): %s%%\n" %\
-             str(cpu_percent_sys) + \
-            "Used Memory Percent(total): %s%%\n" %\
-             str(phymem_list_sys[0]) + \
-            "Used Memory Size(total): %sMB\n" %\
-             str(phymem_list_sys[1]) + \
-            "Total Memory Size(total): %sMB\n" %\
-             str(phymem_list_sys[2]) +\
-            "IOPS_read: %s\n" %\
-             str(iops_read) +\
-            "IOPS_write: %s\n" %\
-             str(iops_write) +\
-            "BW_read: %sMbps\n" %\
-             str(BW_read) +\
-            "BW_write: %sMbps" %\
-             str(BW_write)
+         """show data in """
+         print "*-"*32+"\n"+" "*23+"DATA INFO\n"
+         print "System monitoring data\n"+"-"*24
+         print "CPU percent(total): %s%%\n" %\
+                str(cpu_percent_sys) + \
+               "Used Memory Percent(total): %s%%\n" %\
+                str(phymem_list_sys[0]) + \
+               "Used Memory Size(total): %sMB\n" %\
+                str(phymem_list_sys[1]) + \
+               "Total Memory Size(total): %sMB\n" %\
+                str(phymem_list_sys[2]) +\
+               "IOPS_read: %s\n" %\
+                str(iops_read) +\
+               "IOPS_write: %s\n" %\
+                str(iops_write) +\
+               "BW_read: %sMbps\n" %\
+                str(BW_read) +\
+               "BW_write: %sMbps" %\
+                str(BW_write)
             
-      print "\npid(%s) monitoring data\n" % \
-             self.pid_name + "-"*24
-      print "pid_CPU_percent: %s%%\n" %\
-             str(cpu_percent_pid) +\
-            "pid_mem_used: %sMB\n" %\
-             str(memory_used_pid/1024/1204) +\
-            "pid_IOPS_read: %s\n" %\
-             str(iodata_pid_list[0])+\
-            "pid_IOPS_write: %s\n" %\
-             str(iodata_pid_list[1])+\
-            "pid_BW_read: %sMbps\n" %\
-             str(iodata_pid_list[2])+\
-            "pid_BW_write: %sMbps\n" %\
-             str(iodata_pid_list[3])
-      print " "*27+"END"+"\n"+"*-"*32
+         print "\npid(%s) monitoring data\n" % \
+                self.pid_name + "-"*24
+         print "pid_CPU_percent: %s%%\n" %\
+                str(cpu_percent_pid) +\
+               "pid_mem_used: %sMB\n" %\
+                str(memory_used_pid/1024/1204) +\
+               "pid_IOPS_read: %s\n" %\
+                str(iodata_pid_list[0])+\
+               "pid_IOPS_write: %s\n" %\
+                str(iodata_pid_list[1])+\
+               "pid_BW_read: %sMbps\n" %\
+                str(iodata_pid_list[2])+\
+               "pid_BW_write: %sMbps\n" %\
+                str(iodata_pid_list[3])
+         print " "*27+"END"+"\n"+"*-"*32
              
-      """"""      
+         """write system data"""
+         sys_write_sys.writerow([str(cpu_percent_sys),\
+                                str(phymem_list_sys[0]),\
+                                str(phymem_list_sys[1]),\
+                                str(phymem_list_sys[2]),\
+                                str(iops_read),\
+                                str(iops_write),\
+                                str(BW_read),\
+                                str(BW_write)])
+
+         """write pid data"""
+         sys_write_pid.writerow([str(cpu_percent_pid),
+                                 str(memory_used_pid/1024/1204),
+                                 str(iodata_pid_list[0]),
+                                 str(iodata_pid_list[1]),
+                                 str(iodata_pid_list[2]),
+                                 str(iodata_pid_list[3])])
       
 if __name__ == '__main__':
-    m = monitor_linux_for_influxd(20365)
-    m.show_and_record_data()
+    run_me = monitor_linux_for_influxd(20365,5)
+    run_me.show_and_record_data()
